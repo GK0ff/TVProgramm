@@ -1,0 +1,111 @@
+using System;
+class Program 
+{
+  static void Main()
+  {
+      remoteConrol control = new remoteConrol(false, 1, 10, 15);
+      control.OnOff();
+      control.ChooseChannel(8);
+      control.ChannelUp();
+      control.ChannelUp();
+      control.ChannelUp();
+      control.ChannelDown();
+      control.VolumeUp();
+      Console.WriteLine(control.channel);
+      Console.WriteLine(control.volume);
+      control.VolumeMute();
+      Console.WriteLine(control.volume);
+      control.VolumeMute();
+      Console.WriteLine(control.volume);
+  }
+}
+class remoteConrol
+{
+    public bool IsWorking{get; private set;}
+    public int channel{get; private set;}
+    public int previousChannel{get; private set;}
+    public int channelTotal{get; private set;}
+    public int volume{get; private set;}
+    public int volumeBeforeMuting{get; private set;}
+    public bool IsMuted{get; private set;}
+    
+    public remoteConrol(bool IsWorking, int channel, int channelTotal, int volume)
+    {
+        this.IsWorking = IsWorking;
+        
+        if (channel > 0 && channel <= channelTotal)
+        {
+            this.channel = channel;
+            this.previousChannel = channel;
+        }
+        else throw new ArgumentException();
+        
+        if (channelTotal >= 0)
+            this.channelTotal = channelTotal;
+        else throw new ArgumentException();
+        
+        if (volume >= 0 && volume <= 100)
+        {
+           this.volume = volume;
+            this.volumeBeforeMuting = volume; 
+        }
+        else throw new ArgumentException();
+    }
+    
+    public void OnOff()
+    {
+        IsWorking = !IsWorking;
+    }
+    
+    public void ChannelUp()
+    {
+        channel++;
+        channel %= channelTotal;
+    }
+    
+    public void ChannelDown()
+    {
+        channel--;
+        if (channel == 0)
+            channel = channelTotal;
+    }
+    
+    public void ChooseChannel(int chosenChannel)
+    {
+        if (chosenChannel > 0 && chosenChannel <= channelTotal)
+            channel = chosenChannel;
+        else throw new ArgumentException();
+    }
+    
+    public void ReturnChannel()
+    {
+        var temporary = channel;
+        channel = previousChannel;
+        previousChannel = temporary;
+    }
+    
+    public void VolumeUp()
+    {
+        volume++;
+        if (volume == 101)
+            volume = 100;
+    }
+    
+    public void VolumeDown()
+    {
+        volume--;
+        if (volume == -1)
+            volume = 0;
+    }
+    
+    public void VolumeMute()
+    {
+        IsMuted = !IsMuted;
+        if (IsMuted == true)
+        {
+            volumeBeforeMuting = volume;
+            volume = 0;
+        }
+        else volume = volumeBeforeMuting;
+    }
+}
